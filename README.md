@@ -51,3 +51,57 @@ After running the script, you’ll have a fully configured **Cacti monitoring se
 
 ---
 
+
+
+---
+
+## 🛠 Step-by-Step Installation of WeatherMap Plugin
+
+1. **Navigate to Cacti plugins directory**
+   ```bash
+   cd /var/www/html/cacti/plugins
+   ```
+
+2. **Download WeatherMap plugin**
+   ```bash
+   git clone https://github.com/Cacti/plugin_weathermap.git weathermap
+   ```
+
+3. **Set permissions**
+   ```bash
+   chown -R www-data:www-data /var/www/html/cacti/plugins/weathermap
+   chmod -R 755 /var/www/html/cacti/plugins/weathermap
+   ```
+
+4. **Enable plugin in Cacti**
+   - Log in to Cacti web UI as admin.
+   - Go to **Console → Configuration → Plugins**.
+   - You should see **WeatherMap** listed.
+   - Click **Install** and then **Enable**.
+
+5. **Verify PHP modules**
+   - WeatherMap requires `gd` and `pcre` PHP modules.
+   - Install if missing:
+     ```bash
+     sudo apt-get install php-gd php-pcre -y
+     sudo systemctl restart apache2
+     ```
+
+6. **Create maps**
+   - After enabling, you’ll see a **WeatherMap Editor** menu in Cacti.
+   - Use it to draw network maps, add links, icons, and configure data sources (SNMP, RRDTool, etc.).
+
+---
+
+
+
+
+---
+
+## 🔑 Notes
+- Works with **Cacti 1.x upwards**.  
+- Maps can be customized with icons, backgrounds, colors, and labels.  
+- Output can be embedded in dashboards or exported for reports.  
+
+---
+
