@@ -8,13 +8,14 @@ set -e
 
 echo "🔧 Updating system packages..."
 apt-get update -y
+apt-get upgrade -y
 
 echo "📦 Installing dependencies..."
 apt-get install -y snmp php-snmp rrdtool librrds-perl unzip curl git gnupg2
 
 echo "🌐 Installing LAMP stack (Apache, MariaDB, PHP)..."
 apt-get install -y apache2 mariadb-server php php-mysql libapache2-mod-php \
-    php-xml php-ldap php-mbstring php-gd php-gmp
+    php-xml php-ldap php-mbstring php-gd php-gmp php-intl
 
 echo "📝 Configuring PHP..."
 PHP_VERSION=$(php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;")
@@ -88,37 +89,37 @@ EOF
 
 echo "🌐 Configuring Apache Virtual Host for Cacti..."
 cat > /etc/apache2/sites-available/cacti.conf <<EOF
-Alias /cacti /var/www/html/cacti
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html/cacti
 
-<Directory /var/www/html/cacti>
-    Options +FollowSymLinks
-    AllowOverride None
-    <IfVersion >= 2.3>
+    <Directory /var/www/html/cacti>
+        Options +FollowSymLinks
+        AllowOverride None
         Require all granted
-    </IfVersion>
-    <IfVersion < 2.3>
-        Order Allow,Deny
-        Allow from all
-    </IfVersion>
 
-    AddType application/x-httpd-php .php
+        AddType application/x-httpd-php .php
 
-    <IfModule mod_php.c>
-        php_flag magic_quotes_gpc Off
-        php_flag short_open_tag On
-        php_flag register_globals Off
-        php_flag register_argc_argv On
-        php_flag track_vars On
-        php_value mbstring.func_overload 0
-        php_value include_path .
-    </IfModule>
+        <IfModule mod_php.c>
+            php_flag magic_quotes_gpc Off
+            php_flag short_open_tag On
+            php_flag register_globals Off
+            php_flag register_argc_argv On
+            php_flag track_vars On
+            php_value mbstring.func_overload 0
+            php_value include_path .
+        </IfModule>
 
-    DirectoryIndex index.php
-</Directory>
+        DirectoryIndex index.php
+    </Directory>
+
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
 EOF
 
 a2ensite cacti
-systemctl restart apache2
+systemctl reload apache2
 
 echo "✅ Cacti installation and configuration complete!"
-echo "👉 Access Cacti at: http://<your-server-ip>/cacti"
+echo "👉 Access Cacti at: http://<your-server-ip>/"
