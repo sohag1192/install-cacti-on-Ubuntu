@@ -83,7 +83,7 @@ chown -R www-data:www-data /var/www/html/cacti/
 chmod -R 775 /var/www/html/cacti/
 
 echo "⏲️ Setting up Cacti cron job..."
-cat > /etc/cron.d/cacti <<EOF
+nano > /etc/cron.d/cacti <<EOF
 */5 * * * * www-data php /var/www/html/cacti/poller.php > /dev/null 2>&1
 EOF
 
