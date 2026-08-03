@@ -24,13 +24,12 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y apache2 mariadb-server \
 
 echo "📝 Configuring PHP..."
 PHP_VERSION=$(php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;")
-
 for ini in /etc/php/${PHP_VERSION}/apache2/php.ini /etc/php/${PHP_VERSION}/cli/php.ini; do
     if [ -f "$ini" ]; then
         sed -i 's/^memory_limit.*/memory_limit = 512M/' "$ini"
         sed -i 's/^max_execution_time.*/max_execution_time = 60/' "$ini"
-        sed -i 's@^;date.timezone.*@date.timezone = Asia/Dhaka@' "$ini"
-        sed -i 's@^date.timezone.*@date.timezone = Asia/Dhaka@' "$ini"
+        sed -i 's@^;date.timezone.*@date.timezone = Asia/Kolkata@' "$ini"
+        sed -i 's@^date.timezone.*@date.timezone = Asia/Kolkata@' "$ini"
     fi
 done
 systemctl restart apache2
@@ -39,18 +38,24 @@ echo "🗄️ Configuring MariaDB..."
 cat >> /etc/mysql/mariadb.conf.d/50-server.cnf <<EOF
 
 # Custom Cacti settings
+[mysqld]
 collation-server = utf8mb4_unicode_ci
 character-set-server = utf8mb4
 max_heap_table_size = 512M
 tmp_table_size = 512M
 join_buffer_size = 1024M
-innodb_buffer_pool_size = 1G
+innodb_buffer_pool_size = 16384M
 innodb_flush_log_at_timeout = 3
 innodb_read_io_threads = 32
 innodb_write_io_threads = 32
 innodb_io_capacity = 5000
 innodb_io_capacity_max = 10000
+innodb_buffer_pool_instances = 50
 innodb_doublewrite = OFF
+# Deprecated options commented out:
+# innodb_file_format = Barracuda
+# innodb_large_prefix = 1
+#collation-server = utf8mb4_general_ci
 EOF
 
 systemctl restart mariadb
@@ -78,7 +83,6 @@ mysql ${DB_NAME} < /var/www/html/cacti/cacti.sql
 echo "⚙️ Configuring Cacti..."
 cp /var/www/html/cacti/include/config.php.dist /var/www/html/cacti/include/config.php
 CONFIG_FILE="/var/www/html/cacti/include/config.php"
-
 sed -i "s/\$database_default = 'cacti';/\$database_default = '${DB_NAME}';/" $CONFIG_FILE
 sed -i "s/\$database_username = 'cactiuser';/\$database_username = '${DB_USER}';/" $CONFIG_FILE
 sed -i "s/\$database_password = 'cactiuser';/\$database_password = '${DB_PASS}';/" $CONFIG_FILE
@@ -96,19 +100,16 @@ EOF
 
 echo "🌐 Configuring Apache Virtual Host for Cacti..."
 a2dissite 000-default.conf || true
-
 cat > /etc/apache2/sites-available/cacti.conf <<EOF
 <VirtualHost *:80>
     ServerAdmin webmaster@localhost
     DocumentRoot /var/www/html/cacti
-
     <Directory /var/www/html/cacti>
         Options +FollowSymLinks
         AllowOverride None
         Require all granted
         DirectoryIndex index.php
     </Directory>
-
     ErrorLog \${APACHE_LOG_DIR}/error.log
     CustomLog \${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
@@ -121,6 +122,6 @@ SERVER_IP=$(hostname -I | awk '{print $1}')
 
 echo "========================================================"
 echo "✅ Cacti 1.2.28 installation complete!"
-echo "👉 Access Cacti at: http://${SERVER_IP}/"
+echo "👉 Access Cacti at: http://${SERVER_IP}/cacti"
 echo "🔑 Default Login: admin / admin"
 echo "========================================================"
