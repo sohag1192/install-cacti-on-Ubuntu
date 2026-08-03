@@ -46,7 +46,7 @@ The fastest way to deploy Cacti is using the provided shell script.
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/sohag1192/install-cacti-on-Ubuntu.git
+git clone [https://github.com/sohag1192/install-cacti-on-Ubuntu.git](https://github.com/sohag1192/install-cacti-on-Ubuntu.git)
 cd install-cacti-on-Ubuntu
 
 ```
@@ -65,13 +65,13 @@ sudo ./install.sh
 
 ```
 
-* *Note: You will be prompted for the MariaDB root password during the database setup phase.*
-* *Note: The script defaults the timezone to **Asia/Dhaka**. You can modify this inside `install.sh` prior to running.*
+> **Note:** You will be prompted for the MariaDB root password during the database setup phase.
+> **Note:** The script defaults the timezone to **Asia/Dhaka**. You can modify this inside `install.sh` prior to running if you are deploying in a different region.
 
 ### 4. Access the Cacti Web UI
 
 * Open your web browser and navigate to your server's IP address: `http://<your-server-ip>/`
-* **Default Login:** `admin` / `admin` (You will be forced to change this upon first login).
+* **Default Login:** `admin` / `admin` *(You will be forced to change this upon first login).*
 
 ---
 
@@ -165,11 +165,15 @@ Update `$database_username` and `$database_password` in `sudo nano /var/www/html
 sudo chown -R www-data:www-data /var/www/html/cacti/
 sudo chmod -R 775 /var/www/html/cacti/rra/
 sudo chmod -R 775 /var/www/html/cacti/log/
-sudo nano /etc/cron.d/cacti
 
 ```
 
-Add to cron (polls every 5 minutes):
+Add the poller to cron (polls every 5 minutes):
+
+```bash
+sudo nano /etc/cron.d/cacti
+
+```
 
 ```bash
 */5 * * * * www-data php /var/www/html/cacti/poller.php > /dev/null 2>&1
@@ -258,4 +262,7 @@ Once enabled, the **WeatherMap Editor** menu will appear in Cacti. You can use t
 
 *If you found this Cacti installation script and guide helpful for your NOC operations, please consider giving it a star! ⭐️*
 
-**Developed by [Md Sohag Rana](https://github.com/sohag1192) - ISP Automation Architect & Network Engineer**
+**Developed by [Md. Sohag Rana**](https://github.com/sohag1192)
+
+*ISP Automation Architect & Network Engineer | Sirajganj, Bangladesh*
+
