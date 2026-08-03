@@ -1,6 +1,7 @@
 #!/bin/bash
 # ============================================================
-# Cacti Installer Script for Ubuntu/Linux
+# Cacti Latest Version Installer Script (1.2.31)
+# Ubuntu 20.04/22.04 LTS
 # Author: Md. Sohag Rana (automation adapted)
 # ============================================================
 
@@ -38,17 +39,19 @@ echo "🗄️ Configuring MariaDB..."
 cat >> /etc/mysql/mariadb.conf.d/50-server.cnf <<EOF
 
 # Custom Cacti settings
+[mysqld]
 collation-server = utf8mb4_unicode_ci
 character-set-server = utf8mb4
 max_heap_table_size = 512M
 tmp_table_size = 512M
 join_buffer_size = 1024M
-innodb_buffer_pool_size = 1G
+innodb_buffer_pool_size = 16384M
 innodb_flush_log_at_timeout = 3
 innodb_read_io_threads = 32
 innodb_write_io_threads = 32
 innodb_io_capacity = 5000
 innodb_io_capacity_max = 10000
+innodb_buffer_pool_instances = 50
 innodb_doublewrite = OFF
 EOF
 
@@ -64,9 +67,9 @@ mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 mysql -e "GRANT SELECT ON mysql.time_zone_name TO '${DB_USER}'@'localhost';"
 mysql -e "FLUSH PRIVILEGES;"
 
-echo "⬇️ Downloading Cacti..."
-wget https://www.cacti.net/downloads/cacti-latest.tar.gz
-tar -zxvf cacti-latest.tar.gz
+echo "⬇️ Downloading Cacti Latest Version (1.2.31)..."
+wget -qO cacti-latest.tar.gz https://www.cacti.net/downloads/cacti-latest.tar.gz
+tar -zxf cacti-latest.tar.gz
 rm cacti-latest.tar.gz
 rm -f /var/www/html/index.html
 mv cacti-1* /var/www/html/cacti
@@ -115,7 +118,7 @@ systemctl reload apache2
 SERVER_IP=$(hostname -I | awk '{print $1}')
 
 echo "========================================================"
-echo "✅ Cacti installation and configuration complete!"
-echo "👉 Access Cacti at: http://${SERVER_IP}/"
+echo "✅ Cacti Latest Version (1.2.31) installation complete!"
+echo "👉 Access Cacti at: http://${SERVER_IP}/cacti"
 echo "🔑 Default Login: admin / admin"
 echo "========================================================"
