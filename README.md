@@ -1,4 +1,3 @@
-
 <div align="center">
 
 # 📊 Cacti Network Monitoring: Ubuntu Installation Guide
