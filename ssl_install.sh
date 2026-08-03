@@ -1,8 +1,17 @@
 #!/bin/bash
 # Apache SSL Setup & Redirect Script for Cacti
-# Author: Copilot (for Md. Sohag Rana)
+# Author:  (for Md. Sohag Rana)
 
 set -e
+
+echo "=== Checking for Certbot ==="
+if ! command -v certbot &> /dev/null; then
+    echo "Certbot not found. Installing..."
+    sudo apt update
+    sudo apt install certbot python3-certbot-apache -y
+else
+    echo "Certbot is already installed."
+fi
 
 DOMAIN="graph.yourdomin.com"
 DOCROOT="/var/www/html"
